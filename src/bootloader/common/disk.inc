@@ -1,0 +1,1 @@
+extern disk_load
