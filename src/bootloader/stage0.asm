@@ -80,23 +80,17 @@ stage0:
   jmp $
 
 clscr:
-  push ax
-  push bx
-  push cx
-  push dx
+  pusha
 
-  mov ah, 0x06
+  mov ah, 0x07
   mov al, 0
-  xor bx, bx
+  mov bh, 0x07
   xor cx, cx
-  xor dx, dx
+  mov dx, 0x184f
 
   int 0x10
 
-  pop dx
-  pop cx
-  pop bx
-  pop ax
+  popa
 
   ret
 
