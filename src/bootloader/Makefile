@@ -1,14 +1,14 @@
 ASM=nasm
-ASMFLAGS=-f elf32 -F dwarf -O0 -g
+ASMFLAGS=-f elf32 -F dwarf -O0 -g -static
 LD=x86_64-linux-gnu-ld
-LDFLAGS=-m elf_i386 -Tlinker.ld -static -no-pie -O0 -M -g
+LDFLAGS=-m elf_i386 -Tlinker.ld -static -no-pie -O0 -g
 OBJCP=x86_64-linux-gnu-objcopy
 STRIP=x86_64-linux-gnu-strip
 QEMU=qemu-system-i386
 GDB=x86_64-elf-gdb
 
 SRCS=stage0.asm stage1.asm
-LIBS=common/puts.asm common/print_hex.asm common/disk_load.asm common/nl.asm
+LIBS=$(wildcard common/print/*.asm) $(wildcard common/disk/*.asm)
 OBJS=$(SRCS:.asm=.o)
 LIBS_OBJS=$(LIBS:.asm=.o)
 
@@ -41,6 +41,9 @@ dump: clean always $(OUT_DIR)/boot.elf
 always:
 	mkdir -p out
 	mkdir -p out/common
+	mkdir -p out/common/print
+	mkdir -p out/common/disk
+	mkdir -p out/common/serial
 
 clean:
 	rm -rf $(OUT_DIR)
