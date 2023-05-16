@@ -26,8 +26,3 @@ stage0:
   jmp $
 
 BOOT_DRIVE: db 0x0 
-spacing: db " ", 0
-offset: db 0
-section .bss
-
-buffer: resb 20
