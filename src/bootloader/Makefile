@@ -1,15 +1,15 @@
 ASM=nasm
 ASMFLAGS=-f elf32 -F dwarf -O0 -g -static
 LD=x86_64-linux-gnu-ld
-LDFLAGS=-m elf_i386 -Tlinker.ld -static -no-pie -O0 -g
+LDFLAGS=-m elf_i386 -Tlinker.ld -static -no-pie -O0 -g -Map out/out.map
 OBJCP=x86_64-linux-gnu-objcopy
 STRIP=x86_64-linux-gnu-strip
 QEMU=qemu-system-i386
 GDB=x86_64-elf-gdb
 
 SRCS=stage0.asm stage1.asm
-LIBS=$(wildcard common/print/*.asm) $(wildcard common/disk/*.asm)
-OBJS=$(SRCS:.asm=.o)
+LIBS=$(addprefix $(OUT_DIR)/common/,disk/disk_load.asm print/puts.asm)
+OBJS=$(addprefix $(OUT_DIR)/,$(SRCS:.asm=.o))
 LIBS_OBJS=$(LIBS:.asm=.o)
 
 OUT_DIR=out
@@ -21,31 +21,25 @@ $(OUT_DIR)/disk.img: $(OUT_DIR)/boot.bin
 $(OUT_DIR)/boot.bin: $(OUT_DIR)/boot.elf
 	$(OBJCP) --strip-all -O binary $^ $@
 
-$(OUT_DIR)/boot.elf: $(LIBS_OBJS) $(OBJS) 
-	$(LD) $(LDFLAGS) -o $@ $(addprefix $(OUT_DIR)/,$^)
+$(OUT_DIR)/boot.elf: $(LIBS_OBJS) $(OBJS)
+	$(LD) $(LDFLAGS) -o $@ $^
 
-%.o: %.asm always
-	$(ASM) $(ASMFLAGS) $< -o $(OUT_DIR)/$@
+$(OUT_DIR)/%.o: %.asm
+	@mkdir -p $(@D)
+	$(ASM) $(ASMFLAGS) $< -o $@
 
-run: clean always $(OUT_DIR)/disk.img
+run: clean $(OUT_DIR)/disk.img
 	$(QEMU) -fda $(OUT_DIR)/disk.img -boot a
 
-run-debug: clean always $(OUT_DIR)/disk.img
+run-debug: clean $(OUT_DIR)/disk.img
 	$(QEMU) -drive format=raw,file=$(OUT_DIR)/disk.img -s -S &
 	$(GDB) -ex "call ptrace(PTRACE_SEIZE, `pgrep qemu-system-i386`, NULL, NULL)" -x gdbrc.txt
 	kill `pgrep qemu-system-i386`
 
-dump: clean always $(OUT_DIR)/boot.elf
+dump: clean $(OUT_DIR)/boot.elf
 	objdump -DS $(OUT_DIR)/boot.elf | less
 	
-always:
-	mkdir -p out
-	mkdir -p out/common
-	mkdir -p out/common/print
-	mkdir -p out/common/disk
-	mkdir -p out/common/serial
-
 clean:
 	rm -rf $(OUT_DIR)
 
-.PHONY: always clean run
+.PHONY: clean run
