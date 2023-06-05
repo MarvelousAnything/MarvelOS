@@ -8,7 +8,7 @@ QEMU=qemu-system-i386
 GDB=x86_64-elf-gdb
 
 SRCS=stage0.asm stage1.asm
-LIBS=$(addprefix $(OUT_DIR)/common/,disk/disk_load.asm print/puts.asm)
+LIBS=$(addprefix $(OUT_DIR)/common/,disk/disk_load.asm print/puts.asm gdt.asm)
 OBJS=$(addprefix $(OUT_DIR)/,$(SRCS:.asm=.o))
 LIBS_OBJS=$(LIBS:.asm=.o)
 

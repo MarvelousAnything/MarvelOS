@@ -4,25 +4,40 @@
 %include "common/print.inc"
 %include "common/macros.inc"
 %include "common/disk.inc"
+
 extern stage1
 
 section .text
 global stage0
 
 stage0:
-  mov [BOOT_DRIVE], dl
+  ; setup segment registers for tiny memory model
+  xor ax, ax
+  mov ds, ax
+  mov es, ax
+  mov ss, ax
 
-  mov bp, 0x8000
-  mov sp, bp
-  
-  mov bx, 0x9000
-  mov dh, 5
-  mov dl, [BOOT_DRIVE]
-  call disk_load
+  ; init stack
+  mov sp, 0x7c00
 
-  push es
-  push word 0x9000
+  ; transfer control to .setup
+  push ax
+  push word .setup
   retf
-  jmp $
 
-BOOT_DRIVE: db 0x0 
+  .setup:
+    mov [drive], dl
+
+    mov bx, 0x9000 ; make sure this is consistent with the ORIGIN value for STAGE1 in linker.ld
+    mov dh, 5
+    mov dl, [drive]
+    call disk_load
+
+    ; transfer control to stage1
+    push es
+    push word stage1
+    retf
+    jmp $ ; hang if the bootloader somehow gets back here. 
+
+section .data
+drive: db 0x0 

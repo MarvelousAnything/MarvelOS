@@ -5,23 +5,21 @@ MEMORY {
   SIG (r) : ORIGIN = 0x7dfe, LENGTH = 2
   STAGE1 (rx) : ORIGIN = 0x9000, LENGTH = 32768
   BIOSROM (rx) : ORIGIN = 0xf0000, LENGTH = 65536
-  VGABUF (rw) : ORIGIN = 0xb8000, LENGTH = 16384
+  VGATXTBUF (rw) : ORIGIN = 0xb8000, LENGTH = 16384
+  VGAPXBUF (rw) : ORIGIN = 0xa0000, LENGTH = 16384
 }
 
 SECTIONS {
   .text : {
     *(.text)
     *(.libs)
-    *(.print_hex_text)
     *(.disk_load_text)
-    *(.nl_text)
+    *(.gdt)
   } > BOOTROM
 
   .data : {
     *(.data)
-    *(.print_hex_data)
     *(.disk_load_data)
-    *(.bss)
   } > BOOTROM
   
   .signature : {
@@ -36,35 +34,39 @@ SECTIONS {
     *(.biosrom)
   } > BIOSROM
 
-  .vgabuf : {
-    *(.vgabuf)
-  } > VGABUF
+  .vgatxtbuf : {
+    *(.vgatxtbuf)
+  } > VGATXTBUF
+
+  .vgapxbuf : {
+    *(.vgapxbuf)
+  } > VGAPXBUF
 
   .debug_aranges : {
     *(.debug_aranges)
-  } > default
+  }
 
   .debug_pubnames : {
     *(.debug_pubnames)
-  } > default
+  }
 
   .debug_info : {
     *(.debug_info)
-  } > default
+  }
 
   .debug_abbrev : {
     *(.debug_abbrev)
-  } > default
+  }
 
   .debug_line : {
     *(.debug_line)
-  } > default
+  }
 
   .debug_frame : {
     *(.debug_frame)
-  } > default
+  }
 
   .debug_loc : {
     *(.debug_loc)
-  } > default
+  }
 }
