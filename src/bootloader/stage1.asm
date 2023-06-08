@@ -3,10 +3,8 @@
 %include "common/print.inc"
 %include "common/gdt.inc"
 
-section .stage1
+section .text
 global stage1
-
-hello: db "Hello World!", ENDL, 0
 
 stage1:
   mov si, hello
@@ -29,17 +27,20 @@ stage1:
 
 [bits 32]
 start_protected_mode:
-  ; mov eax, 0
-  ; mov ebx, 0
-  ; mov ecx, 320
-  ; mov edx, 20
-  ; mov esi, 0x0a
-  ; call putrect
+  mov eax, 0
+  mov ebx, 0
+  mov ecx, 320
+  mov edx, 20
+  mov esi, 0x0a
+  call putrect
 
-  mov eax, 100   ; x1
-  mov ebx, 100   ; y1
-  mov ecx, 0   ; x2
-  mov edx, 50   ; y2
+  mov eax, 100   ; x0
+  mov ebx, 0   ; y0
+  mov ecx, 50  ; x1
+  mov edx, 50   ; y1
   mov esi, 0x04 ; color
   call drawline
   jmp $
+
+section .data
+hello: db "Hello World!", ENDL, 0

@@ -11,14 +11,14 @@ MEMORY {
 
 SECTIONS {
   .text : {
-    *(.text)
+    *stage0.o(.text)
     *(.libs)
     *(.disk_load_text)
     *(.gdt)
   } > BOOTROM
 
   .data : {
-    *(.data)
+    *stage0.o(.data)
     *(.disk_load_data)
   } > BOOTROM
   
@@ -26,8 +26,9 @@ SECTIONS {
     SHORT(0xAA55)
   } > SIG
 
-  .stage1 : AT(0x7e00) {
-    *(.stage1)
+  .text : AT(0x7e00) {
+    *stage1.o(.text)
+    *stage1.o(.data)
   } > STAGE1
 
   .biosrom : {
@@ -42,31 +43,31 @@ SECTIONS {
     *(.vgapxbuf)
   } > VGAPXBUF
 
-  .debug_aranges : {
-    *(.debug_aranges)
-  }
+  /* .debug_aranges : { */
+  /*   *(.debug_aranges) */
+  /* } */
 
-  .debug_pubnames : {
-    *(.debug_pubnames)
-  }
+  /* .debug_pubnames : { */
+  /*   *(.debug_pubnames) */
+  /* } */
 
-  .debug_info : {
-    *(.debug_info)
-  }
+  /* .debug_info : { */
+  /*   *(.debug_info) */
+  /* } */
 
-  .debug_abbrev : {
-    *(.debug_abbrev)
-  }
+  /* .debug_abbrev : { */
+  /*   *(.debug_abbrev) */
+  /* } */
 
-  .debug_line : {
-    *(.debug_line)
-  }
+  /* .debug_line : { */
+  /*   *(.debug_line) */
+  /* } */
 
-  .debug_frame : {
-    *(.debug_frame)
-  }
+  /* .debug_frame : { */
+  /*   *(.debug_frame) */
+  /* } */
 
-  .debug_loc : {
-    *(.debug_loc)
-  }
+  /* .debug_loc : { */
+  /*   *(.debug_loc) */
+  /* } */
 }

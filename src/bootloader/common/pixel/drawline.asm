@@ -2,29 +2,6 @@
 extern putpx
 global drawline
 
-; plotLine(x0, y0, x1, y1)
-;     dx = abs(x1 - x0)
-;     sx = x0 < x1 ? 1 : -1
-;     dy = -abs(y1 - y0)
-;     sy = y0 < y1 ? 1 : -1
-;     error = dx + dy
-;     
-;     while true
-;         plot(x0, y0)
-;         if x0 == x1 && y0 == y1 break
-;         e2 = 2 * error
-;         if e2 >= dy
-;             if x0 == x1 break
-;             error = error + dy
-;             x0 = x0 + sx
-;         end if
-;         if e2 <= dx
-;             if y0 == y1 break
-;             error = error + dx
-;             y0 = y0 + sy
-;         end if
-;     end while
-
 ;
 ; eax - x0
 ; ebx - y0
@@ -33,108 +10,73 @@ global drawline
 ; esi - color
 ;
 drawline:
-  push ebp
-  mov ebp, esp
-  sub esp, 0x30
+  push esi
+  push edx
+  push ecx
+  push ebx
+  push eax
 
-  ; Store variables on the stack
-  mov dword [ebp - 0x04], eax ; x0
-  mov dword [ebp - 0x08], ebx ; y0
-  mov dword [ebp - 0x0C], ecx ; x1
-  mov dword [ebp - 0x10], edx ; y1
-  mov dword [ebp - 0x14], esi ; color
+  pop edx ; edx = x0
+  sub edx, ecx ; dx = x0 - x1
+  mov ebx, edx ; ebx = dx
+  neg ebx ; ebx = -dx
 
-  ; Calculate dx and dy
-  mov eax, dword [ebp - 0x0C]
-  sub eax, dword [ebp - 0x04]
-  mov dword [ebp - 0x18], eax ; dx = x1 - x0
-
-  mov eax, dword [ebp - 0x10]
-  sub eax, dword [ebp - 0x08]
-  mov dword [ebp - 0x1C], eax ; dy = y1 - y0
-
-  ; Calculate sx and sy
-  mov eax, 1
-  cmp dword [ebp - 0x18], 0
-  jge .sx_cont
+  pop ecx ; ecx = y0
+  sub ecx, edx ; ecx = y0 - dx
+  mov eax, ecx
   neg eax
-  .sx_cont:
-  mov dword [ebp - 0x20], eax ; sx = sign(dx)
 
-  mov eax, 1
-  cmp dword [ebp - 0x1C], 0
-  jge .sy_cont
-  neg eax
-  .sy_cont:
-  mov dword [ebp - 0x24], eax ; sy = sign(dy)
+  add eax, ebx ; init error
 
-  ; Calculate initial error
-  mov eax, dword [ebp - 0x18]
-  mov edx, dword [ebp - 0x1C]
-  add eax, edx
-  mov dword [ebp - 0x28], eax ; error = dx + dy
+  .loop:
+    push ebx
 
-.loop:
-  ; Plot the current point
-  mov eax, dword [ebp - 0x04]
-  mov ebx, dword [ebp - 0x08]
-  mov edx, dword [ebp - 0x14]
-  call putpx
+    push esi ; color
+    push ebx
+    push eax
+    push edx
 
-  ; Check if we have reached the end point
-  mov eax, dword [ebp - 0x04]
-  cmp eax, dword [ebp - 0x0C]
-  je .check_y
-  mov eax, dword [ebp - 0x08]
-  cmp eax, dword [ebp - 0x10]
-  je .done
+    mov edx, esi
+    call putpx
+    
+    pop edx
+    pop eax
+    pop ebx
+    pop esi
 
-.check_y:
-  ; Calculate e2 = 2 * error
-  mov eax, dword [ebp - 0x28]
-  shl eax, 1
-  mov dword [ebp - 0x2C], eax ; e2 = 2 * error
+    ; cmp eax, 0 ; eax == 0
+    ; je .exit
 
-  ; Check if e2 >= dy
-  cmp eax, dword [ebp - 0x1C]
-  jl .check_x
+    shl eax, 1
+    jc .skip_dx
 
-  ; Check if x0 == x1
-  mov eax, dword [ebp - 0x04]
-  cmp eax, dword [ebp - 0x0C]
-  je .done
+    cmp eax, ebx
+    jg .skip_dy
 
-  ; Update error and x0
-  add eax, dword [ebp - 0x1C]
-  mov dword [ebp - 0x28], eax ; error += dy
+    add eax, ecx
+    inc ecx
 
-  mov eax, dword [ebp - 0x04]
-  add eax, dword [ebp - 0x20] ; x0 = x0 + sx
-  mov [ebp - 0x04], eax
+    .skip_dy:
+      pop ebx
 
-.check_x:
-  ; Check if e2 <= dx
-  cmp eax, dword [ebp - 0x18]
-  jg .next_iteration
+      add ebx, edx
+      inc edx
 
-  ; Check if y0 == y1
-  mov eax, dword [ebp - 0x08]
-  cmp eax, dword [ebp - 0x10]
-  je .done
+      jmp .loop
 
-  ; Update error and y0
-  add eax, dword [ebp - 0x18]
-  mov dword [ebp - 0x28], eax ; error += dx
+    .skip_dx:
+      pop ebx
 
-  mov eax, dword [ebp - 0x08]
-  add eax, dword [ebp - 0x24] ; y0 = y0 + sy
-  mov [ebp - 0x08], eax
+      add eax, ebx
+      inc ebx
 
-.next_iteration:
-  jmp .loop
+      jmp .loop
 
-.done:
-  leave
-  ret
+  .exit:
+    pop ebx
+    pop ecx
+    pop edx
+    pop esi
 
+    ret
 

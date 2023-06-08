@@ -1,7 +1,7 @@
 ASM=nasm
-ASMFLAGS=-f elf32 -F dwarf -O0 -g -static
+ASMFLAGS=-f elf32 -F dwarf -g 
 LD=x86_64-linux-gnu-ld
-LDFLAGS=-m elf_i386 -Tlinker.ld -static -no-pie -O0 -g -Map out/out.map
+LDFLAGS=-g -m elf_i386 -Tlinker.ld -E -no-pie -Map out/out.map
 OBJCP=x86_64-linux-gnu-objcopy
 STRIP=x86_64-linux-gnu-strip
 QEMU=qemu-system-i386
@@ -22,11 +22,11 @@ $(OUT_DIR)/boot.bin: $(OUT_DIR)/boot.elf
 	$(OBJCP) --strip-all -O binary $^ $@
 
 $(OUT_DIR)/boot.elf: $(LIBS_OBJS) $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) --dependency-file=$(OUT_DIR)/dep_file.d -o $@ $^
 
 $(OUT_DIR)/%.o: %.asm
 	@mkdir -p $(@D)
-	$(ASM) $(ASMFLAGS) $< -o $@
+	$(ASM) $(ASMFLAGS) $^ -o $@
 
 run: clean $(OUT_DIR)/disk.img
 	$(QEMU) -fda $(OUT_DIR)/disk.img -boot a
