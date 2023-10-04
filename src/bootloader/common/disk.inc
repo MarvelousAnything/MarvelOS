@@ -1,1 +1,2 @@
 extern disk_load
+extern disk_load_params

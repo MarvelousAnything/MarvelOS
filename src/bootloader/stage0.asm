@@ -10,6 +10,10 @@ extern stage1
 section .text
 global stage0
 
+jmp short stage0
+nop
+%include "common/bpb.asm"
+
 stage0:
   ; setup segment registers for tiny memory model
   xor ax, ax
@@ -26,11 +30,12 @@ stage0:
   retf
 
   .setup:
-    mov [drive], dl
+    mov [bpb.drive_num], dl
 
     mov bx, 0x9000 ; make sure this is consistent with the ORIGIN value for STAGE1 in linker.ld
     mov dh, 5
-    mov dl, [drive]
+    mov dl, [bpb.drive_num]
+    call disk_load_params
     call disk_load
 
     ; transfer control to stage1
@@ -40,4 +45,3 @@ stage0:
     jmp $ ; hang if the bootloader somehow gets back here. 
 
 section .data
-drive: db 0x0 

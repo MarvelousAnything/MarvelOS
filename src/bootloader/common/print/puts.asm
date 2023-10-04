@@ -1,6 +1,6 @@
 [bits 16]
 
-section .libs
+section .text
 global puts
 ;
 ; Puts a string to the screen

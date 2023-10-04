@@ -26,6 +26,8 @@ stage1:
 %include "common/pixel/drawline.asm"
 
 [bits 32]
+extern bpb.oem
+extern font
 start_protected_mode:
   mov eax, 0
   mov ebx, 0
@@ -33,13 +35,19 @@ start_protected_mode:
   mov edx, 20
   mov esi, 0x0a
   call putrect
+  lea edi, [font]
+  mov esi, hello
+  print_loop:
+    lodsb
+    cmp al, 0
+    je done
 
-  mov eax, 100   ; x0
-  mov ebx, 0   ; y0
-  mov ecx, 50  ; x1
-  mov edx, 50   ; y1
-  mov esi, 0x04 ; color
-  call drawline
+    imul eax, eax, 13
+    mov word [0xA0000], ax
+    inc edi
+    jmp print_loop
+  done:
+
   jmp $
 
 section .data

@@ -12,14 +12,11 @@ MEMORY {
 SECTIONS {
   .text : {
     *stage0.o(.text)
-    *(.libs)
-    *(.disk_load_text)
     *(.gdt)
   } > BOOTROM
 
   .data : {
     *stage0.o(.data)
-    *(.disk_load_data)
   } > BOOTROM
   
   .signature : {
@@ -29,6 +26,7 @@ SECTIONS {
   .text : AT(0x7e00) {
     *stage1.o(.text)
     *stage1.o(.data)
+    *(.font_data)
   } > STAGE1
 
   .biosrom : {
@@ -42,32 +40,4 @@ SECTIONS {
   .vgapxbuf : {
     *(.vgapxbuf)
   } > VGAPXBUF
-
-  /* .debug_aranges : { */
-  /*   *(.debug_aranges) */
-  /* } */
-
-  /* .debug_pubnames : { */
-  /*   *(.debug_pubnames) */
-  /* } */
-
-  /* .debug_info : { */
-  /*   *(.debug_info) */
-  /* } */
-
-  /* .debug_abbrev : { */
-  /*   *(.debug_abbrev) */
-  /* } */
-
-  /* .debug_line : { */
-  /*   *(.debug_line) */
-  /* } */
-
-  /* .debug_frame : { */
-  /*   *(.debug_frame) */
-  /* } */
-
-  /* .debug_loc : { */
-  /*   *(.debug_loc) */
-  /* } */
 }

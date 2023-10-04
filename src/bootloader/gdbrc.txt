@@ -1,4 +1,7 @@
 symbol-file out/boot.elf
 target remote localhost:1234
 set disassembly-flavor intel
-break drawline
+layout asm
+layout regs
+break disk_load_params
+break disk_load

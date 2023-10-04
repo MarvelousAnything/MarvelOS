@@ -3,7 +3,7 @@
 %include "common/macros.inc"
 %include "common/print.inc"
 
-section .disk_load_text
+section .text
 global disk_load
 
 ; load DH sectors to ES:BX from drive DL
@@ -30,5 +30,5 @@ disk_load:
   call puts
   jmp $
 
-section .disk_load_data
+section .data
 DISK_ERROR_MSG db "Disk read error!", ENDL, 0

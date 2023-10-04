@@ -3,7 +3,7 @@
 ;
 section .text
 fat16:
-  bdb_oem:                   db 'MSWIN4.1'   ; 8 bytes
+  bdb_oem:                   db "MSWIN4.1"   ; 8 bytes
   bdb_bytes_per_sector:      dw 512
   bdb_sectors_per_cluster:   db 1
   bdb_reserved_sectors:      dw 1
@@ -22,6 +22,6 @@ fat16:
                              db 0
   ebr_signature:             db 29h
   ebr_volume_id:             db 12h, 34h, 56h, 78h
-  ebr_volume_label:          db 'BSOS       '
-  ebr_system_id:             db 'FAT16   '
+  ebr_volume_label:          db "BSOS       "
+  ebr_system_id:             db "FAT16   "
 .end:
